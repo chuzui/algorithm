@@ -9,7 +9,9 @@
 #ifndef PRIORTYQUEUE_H_
 #define PRIORTYQUEUE_H_
 
-typedef int* Queue;
+typedef struct Queue{
+	int* i;
+	} Queue;
 Queue initQueue(size_t n);
 Queue insertQueue(Queue q, Item i);
 Queue extractMinQueue(Queue q);

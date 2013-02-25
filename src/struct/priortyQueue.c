@@ -7,7 +7,3 @@
 #include <stdlib.h>
 #include "priortyQueue.h"
 
-Queue initQueue(size_t n)
-{
-
-}
