@@ -6,7 +6,7 @@
  */
 #include <stdlib.h>
 #include "quickSort.h"
-#include "..\\tool\\rand.h"
+#include "..\tool\rand.h"
 
 #ifdef DEBUG
 static int count = 0;
@@ -23,9 +23,7 @@ int GetCount()
 
 void QuickSort(int* a, int l, int r)
 {
-	#ifdef DEBUG
-	++count;
-	#endif
+
 	if(l < r)
 	{
 		int middle = partition(a,l,r);
@@ -36,28 +34,28 @@ void QuickSort(int* a, int l, int r)
 int partition(int*a, int l, int r)
 {
 
-	int x = a[r];
-	int i,j, tmp;
+
+	int i,j;
 	i = l-1;
 
+#ifdef RAND
 	int randIndex = randAtoB(l, r+1);
-		tmp = a[r];
-		a[r] = a[randIndex];
-		a[randIndex] = tmp;
+	ex(a[r], a[randIndex]);
+#endif
 
+	int x = a[r];
 	for(j = l; j < r; j++)
 	{
+#ifdef DEBUG
+		++count;
+#endif
 		if(a[j] < x)
 		{
 			++i;
-			tmp = a[i];
-			a[i] = a[j];
-			a[j] = tmp;
+			ex(a[i],a[j]);
 		}
 	}
-	tmp = a[i+1];
-	a[i+1] = a[r];
-	a[r] = tmp;
+	ex(a[i+1], a[r]);
 	return i+1;
 }
 

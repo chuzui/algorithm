@@ -7,8 +7,13 @@
 
 #include "sort/quickSort.h"
 #include "tool/rand.h"
+#include "struct/priortyQueue.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+
+#define N 10000
+
 void printArray(int* a, size_t n)
 {
 	int i;
@@ -19,11 +24,18 @@ void printArray(int* a, size_t n)
 
 int main()
 {
-	int a[12] = {13,12,11,10,9,8,7,6,5,4,3,2};
-	//printf("%d\n", GetCount());
-	QuickSort(a, 0, 11);
-	printArray(a, 12);
-	printf("%d", GetCount());
+//	int a[N], i;
+//	for(i = N; i > 0; --i)
+//	{
+//		a[N-i] = i;
+//	}
+	//srand(time(0));
+	//QuickSort(a, 0, N-1);
+
+	Item a[10] = {23,17,14,6,13,10,1,5,7,12};
+	Queue q = initQueue(a, 10);
+	printArray(q->itemArray, 10);
+
 	exit(0);
 }
 
