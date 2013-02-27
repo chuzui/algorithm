@@ -6,11 +6,17 @@
  */
 #include <stdlib.h>
 #include <stddef.h>
-#include "priortyQueue.h"
+#include <limits.h>
+#include "priorityQueue.h"
 
 #define left(i) (((i)<<1)+1)
 #define right(i) (((i)<<1)+2)
 #define parent(i) (((i)-1)>>1)
+#define item(q,i) ((q)->itemArray[(i)])
+#define num(q) ((q)->n)
+#define size(q) ((q)->size)
+#define array(q) ((q)->itemArray)
+
 static void buildMaxHeap(Queue q);
 static void maxHeapify(Queue q, int i);
 
@@ -35,6 +41,52 @@ Queue initQueue(Item* a, int n)
 		q->itemArray = (Item*)malloc(sizeof(Item) * INIT_SIZE);
 	}
 	return q;
+}
+
+void insertQueue(Queue q, Item i)
+{
+	++num(q);
+	if(num(q) > size(q))
+	{
+		int newSize;
+		Item* tmp;
+		newSize = size(q) << 1;
+		tmp = array(q);
+		array(q) = (Item*)malloc(sizeof(Item)*newSize);
+		memcpy(array(q), tmp, size(q) * sizeof(Item));
+		size(q) = newSize;
+	}
+	item(q, (num(q) - 1)) = INT_MIN;
+	increaseKey(q, num(q) - 1, i);
+
+}
+
+Item extractMaxQueue(Queue q)
+{
+	int max;
+	if(q->n < 1)
+		printf("error: the queue is empty");
+	max = q->itemArray[0];
+	q->itemArray[0] = q->itemArray[q->n - 1];
+	q->n--;
+	return max;
+}
+
+Item maxQueue(Queue q)
+{
+	return q->itemArray[0];
+}
+
+void increaseKey(Queue q, int i, Item key)
+{
+	if(less(key, q->itemArray[i]))
+		printf("error: key is small than ");
+	item(q,i) = key;
+	while((i > 0) && (item(q,parent(i)) < item(q,i)))
+	{
+		ex(item(q,parent(i)), item(q,i));
+		i = parent(i);
+	}
 }
 
 static void buildMaxHeap(Queue q)

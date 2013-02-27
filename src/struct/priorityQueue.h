@@ -22,8 +22,9 @@ typedef _queue* Queue;
 #define QUEUE_SIZE sizeof(_queue)
 #define INIT_SIZE 8
 Queue initQueue(Item* a, int n);
-Queue insertQueue(Queue q, Item i);
-Queue extractMinQueue(Queue q);
-Queue decreaseKey(Queue q, Item i);
+void insertQueue(Queue q, Item i);
+Item extractMaxQueue(Queue q);
+Item maxQueue(Queue q);
+void increaseKey(Queue q, int i, Item key);
 
 #endif /* PRIORTYQUEUE_H_ */

@@ -7,7 +7,7 @@
 
 #include "sort/quickSort.h"
 #include "tool/rand.h"
-#include "struct/priortyQueue.h"
+#include "struct/priorityQueue.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -33,7 +33,10 @@ int main()
 	//QuickSort(a, 0, N-1);
 
 	Item a[10] = {23,17,14,6,13,10,1,5,7,12};
-	Queue q = initQueue(a, 10);
+	Queue q = initQueue(NULL, 0);
+	int i;
+	for(i = 0; i < 10; i++)
+		insertQueue(q,a[i]);
 	printArray(q->itemArray, 10);
 
 	exit(0);
