@@ -8,6 +8,7 @@
 #include "sort/quickSort.h"
 #include "tool/rand.h"
 #include "struct/priorityQueue.h"
+#include "struct/bst.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -24,21 +25,7 @@ void printArray(int* a, size_t n)
 
 int main()
 {
-//	int a[N], i;
-//	for(i = N; i > 0; --i)
-//	{
-//		a[N-i] = i;
-//	}
-	//srand(time(0));
-	//QuickSort(a, 0, N-1);
-
-	Item a[10] = {23,17,14,6,13,10,1,5,7,12};
-	Queue q = initQueue(NULL, 0);
-	int i;
-	for(i = 0; i < 10; i++)
-		insertQueue(q,a[i]);
-	printArray(q->itemArray, 10);
-
+	testBST();
 	exit(0);
 }
 
@@ -50,5 +37,24 @@ void testRand()
 		printf("%d ", randAtoB(3, 9));
 	}
 }
+
+void print(Item i)
+{
+	printf("%d ", i);
+}
+
+void testBST()
+{
+	Item a[10] = {23,17,14,6,13,10,1,5,7,12};
+	BST b = initBST();
+	int i;
+	for(i = 0; i < 10; i++)
+	{
+		insertBST(b, a[i]);
+	}
+	walkBST(b, print);
+}
+
+
 
 

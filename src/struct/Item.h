@@ -20,5 +20,6 @@ typedef int Item;
 #define key(i) (i->key)
 #define value(i) (i->value)
 #define ex(x,y) {Item t; t=x; x=y; y=t;}
+#define le(x,y) ((x) < (y))
 
 #endif /* ITEM_H_ */
