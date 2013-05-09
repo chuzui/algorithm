@@ -9,11 +9,13 @@ public class Percolation {
     // create N-by-N grid, with all sites blocked
     private int m_N;
     private WeightedQuickUnionUF union;
+    private WeightedQuickUnionUF onlyTopUnion;
     private boolean openState[][];
 
     public Percolation(int N){
         this.m_N = N;
         union = new WeightedQuickUnionUF(N * N + 2);
+        onlyTopUnion = new WeightedQuickUnionUF(N * N + 1);
         openState = new boolean[N+1][N+1];
         for (int i = 1; i <= N; i++)
         {
@@ -29,25 +31,44 @@ public class Percolation {
         indexCheck(i, j);
         openState[i][j] = true;
         if (i == 1)
+        {
             union.union(coord2index(i, j), 0);
+            onlyTopUnion.union(coord2index(i, j), 0);
+        }
+
 
         if (i > 1)
             if (isOpen(i-1, j))
+            {
                 union.union(coord2index(i, j), coord2index(i-1, j));
+                onlyTopUnion.union(coord2index(i, j), coord2index(i-1, j));
+            }
+
 
         if (i < m_N)
             if (isOpen(i+1, j))
+            {
                 union.union(coord2index(i, j), coord2index(i+1, j));
+                onlyTopUnion.union(coord2index(i, j), coord2index(i+1, j));
+            }
+
 
         if (j > 1)
             if (isOpen(i, j-1))
+            {
                 union.union(coord2index(i, j), coord2index(i, j-1));
+                onlyTopUnion.union(coord2index(i, j), coord2index(i, j-1));
+            }
 
         if (j < m_N)
             if (isOpen(i, j+1))
+            {
                 union.union(coord2index(i, j), coord2index(i, j+1));
+                onlyTopUnion.union(coord2index(i, j), coord2index(i, j+1));
+            }
 
-        if (i == m_N && isFull(i, j))
+
+        if (i == m_N)
             union.union(coord2index(i, j), m_N * m_N + 1);
     }
 
@@ -61,7 +82,7 @@ public class Percolation {
     public boolean isFull(int i, int j)
     {
         indexCheck(i, j);
-        return union.connected(coord2index(i, j), 0) ;
+        return onlyTopUnion.connected(coord2index(i, j), 0) ;
     }
 
     public boolean percolates()
