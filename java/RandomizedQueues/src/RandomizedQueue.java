@@ -15,7 +15,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     private int last  = 0;       // index of next available slot
 
     public RandomizedQueue(){
-        q = (Item[]) new Object[2];
+        q = (Item[])new Object[2];
     }
     public boolean isEmpty()
     {
@@ -47,7 +47,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     public Item dequeue(){
         if (isEmpty()) throw new NoSuchElementException();
-        int index = StdRandom.uniform(first, last);
+        int index = (first + StdRandom.uniform(N)) % q.length;
         Item item = q[index];
         if (last == 0)
             last = q.length - 1;
@@ -56,12 +56,13 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         q[index] = q[last];
         q[last] = null;
         N--;
+        if (N > 0 && N == q.length/4) resize(q.length/2);
         return item;
     }
 
     public Item sample(){
         if (isEmpty()) throw new NoSuchElementException();
-        int index = StdRandom.uniform(first, last);
+        int index = (first + StdRandom.uniform(N)) % q.length;
         Item item = q[index];
         return item;
     }
