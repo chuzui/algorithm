@@ -1,4 +1,4 @@
-import java.util.Arrays
+import java.util.Arrays;
 /**
  * Created with IntelliJ IDEA.
  * User: Administrator
@@ -19,12 +19,33 @@ public class Fast {
             points[i] = p;
         }
 
-        for (Point p: points){
-            Point[] sortedPoints = points.clone();
+        int len = points.length;
+        Point[] sortedPoints = new Point[N - 1];
+        for (int index = 0; index < len; index++){
+            Point p = points[index];
+            int sortedIndex = 0;
+            for (int i = 0; i < N; i++){
+                if (index != i){
+                    sortedPoints[sortedIndex] = points[i];
+                    sortedIndex ++;
+                }
+            }
             Arrays.sort(sortedPoints, p.SLOPE_ORDER);
             int i = 0;
-            for (int j = 1; j < N; j++){
-
+            for (int j = 1; j < N - 1; j++){
+                if (p.slopeTo(sortedPoints[i]) != p.slopeTo(sortedPoints[j])){
+                    if ((j - i) >= 3)
+                    {
+                        if (sortedPoints[i].compareTo(p) == 1){
+                            StdOut.printf("%s -> ", p);
+                            for (int m = i; m < j - 1; m++){
+                                StdOut.printf("%s -> ", sortedPoints[m]);
+                            }
+                            StdOut.printf("%s\n", sortedPoints[j - 1]);
+                        }
+                    }
+                    i = j;
+                }
             }
         }
     }

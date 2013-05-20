@@ -29,7 +29,7 @@ public class Point implements Comparable<Point> {
             slopep2 = p0.slopeTo(p2);
             if (slopeP1 < slopep2) return -1;
             if (slopeP1 > slopep2) return 1;
-            return 0;
+            return p1.compareTo(p2);
         }
     }
 
