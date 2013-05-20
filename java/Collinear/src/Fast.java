@@ -19,6 +19,13 @@ public class Fast {
             points[i] = p;
         }
 
+        StdDraw.setXscale(0, 32768);
+        StdDraw.setYscale(0, 32768);
+        for (Point p: points){
+            p.draw();
+        }
+
+        Arrays.sort(points);
         int len = points.length;
         Point[] sortedPoints = new Point[N - 1];
         for (int index = 0; index < len; index++){
@@ -32,8 +39,8 @@ public class Fast {
             }
             Arrays.sort(sortedPoints, p.SLOPE_ORDER);
             int i = 0;
-            for (int j = 1; j < N - 1; j++){
-                if (p.slopeTo(sortedPoints[i]) != p.slopeTo(sortedPoints[j])){
+            for (int j = 1; j < N; j++){
+                if (j == (N-1) || p.SLOPE_ORDER.compare(sortedPoints[i], sortedPoints[j]) != 0){
                     if ((j - i) >= 3)
                     {
                         if (sortedPoints[i].compareTo(p) == 1){
@@ -42,11 +49,13 @@ public class Fast {
                                 StdOut.printf("%s -> ", sortedPoints[m]);
                             }
                             StdOut.printf("%s\n", sortedPoints[j - 1]);
+                            p.drawTo(sortedPoints[j - 1]);
                         }
                     }
                     i = j;
                 }
             }
+
         }
     }
 }

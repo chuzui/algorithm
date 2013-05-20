@@ -17,6 +17,13 @@ public class Brute {
             Point p = new Point(x, y);
             points[i] = p;
         }
+
+        StdDraw.setXscale(0, 32768);
+        StdDraw.setYscale(0, 32768);
+        for (Point p: points){
+            p.draw();
+        }
+
         Quick.sort(points);
         for (int i = 0; i < N-3; i++)
             for (int j = i + 1; j < N - 2; j++ )
@@ -25,8 +32,10 @@ public class Brute {
                         double slope1 = points[i].slopeTo(points[j]);
                         double slope2 = points[i].slopeTo(points[k]);
                         double slope3 = points[i].slopeTo(points[m]);
-                        if (slope1 == slope2 && slope1 == slope3)
+                        if (slope1 == slope2 && slope1 == slope3){
+                            points[i].drawTo(points[m]);
                             StdOut.printf("%s -> %s -> %s -> %s\n", points[i], points[j], points[k], points[m]);
+                        }
                     }
     }
 }
