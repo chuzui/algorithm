@@ -1,3 +1,4 @@
+import java.util.Arrays
 /**
  * Created with IntelliJ IDEA.
  * User: Administrator
@@ -20,10 +21,10 @@ public class Fast {
 
         for (Point p: points){
             Point[] sortedPoints = points.clone();
-            Quick.sort(sortedPoints);
+            Arrays.sort(sortedPoints, p.SLOPE_ORDER);
             int i = 0;
             for (int j = 1; j < N; j++){
-                if
+
             }
         }
     }

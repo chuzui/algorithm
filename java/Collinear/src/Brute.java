@@ -17,7 +17,7 @@ public class Brute {
             Point p = new Point(x, y);
             points[i] = p;
         }
-
+        Quick.sort(points);
         for (int i = 0; i < N-3; i++)
             for (int j = i + 1; j < N - 2; j++ )
                 for (int k = j + 1; k < N - 1; k++)
