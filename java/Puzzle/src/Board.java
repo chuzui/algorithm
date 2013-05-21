@@ -10,7 +10,6 @@ public class Board {
     private int N;
     private int[][] mBlocks;
     private int mManhattan;
-
     // construct a board from an N-by-N array of blocks
     public Board(int[][] blocks){
        N = blocks.length;
@@ -85,7 +84,7 @@ public class Board {
         if (this.N != that.N || this.manhattan() != that.manhattan()) return false;
         for (int row = 0; row < N; row++)
             for (int col = 0; col < N; col++)
-                if (this.mBlocks[col][row] != that.mBlocks[row][col])
+                if (this.mBlocks[row][col] != that.mBlocks[row][col])
                     return false;
         return true;
     }

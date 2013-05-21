@@ -17,7 +17,7 @@ public class Solver {
         MinPQ twinMinPq = new MinPQ(new ManhattanCom());
 
         Board twinBoard = initial.twin();
-        int insert = 0;
+
         initMinPq.insert(new BoardBag(initial, null, 0));
         twinMinPq.insert(new BoardBag(twinBoard, null, 0));
 
@@ -43,10 +43,7 @@ public class Solver {
                         BoardBag nextBag = new BoardBag(board, currentBoardBag, currentBoardBag.mMoves + 1);
                         if (!initVisitedSet.contains(nextBag)){
                             initMinPq.insert(nextBag);
-                            insert++;
-
                         }
-
                     }
                 }
             }
@@ -79,8 +76,6 @@ public class Solver {
             }
             mMoves = moves;
         }
-        StdOut.print(insert);
-
     }
 
     public boolean isSolvable(){
