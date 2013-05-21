@@ -7,8 +7,9 @@
  * To change this template use File | Settings | File Templates.
  */
 public class Board {
-    int N;
-    int[][] mBlocks;
+    private int N;
+    private int[][] mBlocks;
+    private int mManhattan;
 
     // construct a board from an N-by-N array of blocks
     public Board(int[][] blocks){
@@ -17,6 +18,8 @@ public class Board {
        for (int row = 0; row < N; row++)
            for (int col = 0; col < N; col++)
                mBlocks[row][col] = blocks[row][col];
+
+       mManhattan = -1;
     }
 
     // board dimension N
@@ -37,6 +40,7 @@ public class Board {
     }
 
     public int manhattan(){
+        if (mManhattan != -1) return mManhattan;
         int man = 0;
         for (int row = 0; row < N; row++){
             for (int col = 0; col < N; col++){
@@ -47,7 +51,8 @@ public class Board {
                 }
             }
         }
-        return man;
+        mManhattan = man;
+        return mManhattan;
     }
 
     public boolean isGoal(){
@@ -59,9 +64,16 @@ public class Board {
         for (int row = 0; row < N; row++)
             for (int col = 0; col < N; col++)
                 newBlocks[row][col] = (int)mBlocks[row][col];
-        int temp = newBlocks[0][1];
-        newBlocks[0][1] = newBlocks[0][2];
-        newBlocks[0][2] = temp;
+
+        for (int row = 0; row < N; row++){
+            if (newBlocks[row][0] != 0 && newBlocks[row][1] != 0){
+                int temp = newBlocks[row][0];
+                newBlocks[row][0] = newBlocks[row][1];
+                newBlocks[row][1] = temp;
+                break;
+            }
+        }
+
         return new Board(newBlocks);
     }
 
@@ -70,7 +82,7 @@ public class Board {
         if (y == null) return false;
         if (y.getClass() != this.getClass()) return false;
         Board that = (Board) y;
-        if (this.N != that.N) return false;
+        if (this.N != that.N || this.manhattan() != that.manhattan()) return false;
         for (int row = 0; row < N; row++)
             for (int col = 0; col < N; col++)
                 if (this.mBlocks[col][row] != that.mBlocks[row][col])
@@ -114,7 +126,11 @@ public class Board {
     }
 
     private final Board exchange(int oldRow, int oldCol, int newRow, int newCol){
-        int[][] newBlocks = mBlocks.clone();
+        int[][] newBlocks = new int[N][N];
+        for (int row = 0; row < N; row++)
+            for (int col = 0; col < N; col++)
+                newBlocks[row][col] = mBlocks[row][col];
+
         int temp = newBlocks[oldRow][oldCol];
         newBlocks[oldRow][oldCol] = newBlocks[newRow][newCol];
         newBlocks[newRow][newCol] = temp;

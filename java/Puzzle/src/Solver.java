@@ -10,9 +10,76 @@ import java.util.Comparator;
 public class Solver {
     private boolean mIsSolvable;
     private int mMoves;
+    private Stack<Board> solveStack = null;
 
     public Solver(Board initial){
-        MinPQ minPq = new MinPQ(new ManhattanCom());
+        MinPQ initMinPq = new MinPQ(new ManhattanCom());
+        MinPQ twinMinPq = new MinPQ(new ManhattanCom());
+
+        Board twinBoard = initial.twin();
+        int insert = 0;
+        initMinPq.insert(new BoardBag(initial, null, 0));
+        twinMinPq.insert(new BoardBag(twinBoard, null, 0));
+
+        SET<BoardBag> initVisitedSet = new SET<BoardBag>();
+        SET<BoardBag> twinVisitedSet = new SET<BoardBag>();
+
+
+        BoardBag goal = null;
+        int moves = -1;
+
+        while (true){
+
+            if (!initMinPq.isEmpty()){
+                BoardBag currentBoardBag = (BoardBag)initMinPq.delMin();
+                initVisitedSet.add(currentBoardBag);
+                if (currentBoardBag.mBoard.isGoal()){
+                    mIsSolvable = true;
+                    goal = currentBoardBag;
+                    break;
+                }
+                else{
+                    for (Board board: currentBoardBag.mBoard.neighbors()){
+                        BoardBag nextBag = new BoardBag(board, currentBoardBag, currentBoardBag.mMoves + 1);
+                        if (!initVisitedSet.contains(nextBag)){
+                            initMinPq.insert(nextBag);
+                            insert++;
+
+                        }
+
+                    }
+                }
+            }
+
+            if (!twinMinPq.isEmpty()){
+                BoardBag currentBoardBag = (BoardBag)twinMinPq.delMin();
+                twinVisitedSet.add(currentBoardBag);
+                if (currentBoardBag.mBoard.isGoal()){
+                    mIsSolvable = false;
+                    mMoves = -1;
+                    break;
+                }
+                else{
+                    for (Board board: currentBoardBag.mBoard.neighbors()){
+                        BoardBag nextBag = new BoardBag(board, currentBoardBag, currentBoardBag.mMoves + 1);
+                        if (!twinVisitedSet.contains(nextBag))
+                            twinMinPq.insert(nextBag);
+                    }
+                }
+            }
+
+        }
+
+        if (isSolvable()){
+            solveStack = new Stack<Board>();
+            while (goal != null){
+                solveStack.push(goal.mBoard);
+                goal = goal.mParent;
+                moves += 1;
+            }
+            mMoves = moves;
+        }
+        StdOut.print(insert);
 
     }
 
@@ -25,20 +92,36 @@ public class Solver {
     }
 
     public Iterable<Board> solution(){
-
+         return solveStack;
     }
 
-    private class BoardBag{
+    private class BoardBag implements Comparable<BoardBag>{
 
         Board mBoard;
-        Board mParent;
+        BoardBag mParent;
         int mMoves;
 
-        public BoardBag(Board board, Board parent, int moves)
+        public BoardBag(Board board, BoardBag parent, int moves)
         {
             mBoard = board;
             mParent = parent;
             mMoves = moves;
+        }
+
+        public int compareTo(BoardBag y){
+            if (this.mBoard.equals(y.mBoard))
+                 return 0;
+            if (this.mBoard.manhattan() > y.mBoard.manhattan())
+                return 1;
+            else
+                return -1;
+        }
+
+        public int hashCode(){
+            int hash = 17;
+            int N = mBoard.dimension();
+            hash = mBoard.hamming() * 65535 + mBoard.manhattan() + hash;
+            return hash;
         }
     }
 
