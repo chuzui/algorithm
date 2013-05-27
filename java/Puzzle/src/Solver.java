@@ -18,12 +18,16 @@ public class Solver {
 
         Board twinBoard = initial.twin();
 
-        initMinPq.insert(new BoardBag(initial, null, 0));
-        twinMinPq.insert(new BoardBag(twinBoard, null, 0));
+        BoardBag initBag = new BoardBag(initial, null, 0);
+        BoardBag twinBag = new BoardBag(twinBoard, null, 0);
+
+        initMinPq.insert(initBag);
+        twinMinPq.insert(twinBag);
 
         SET<BoardBag> initVisitedSet = new SET<BoardBag>();
         SET<BoardBag> twinVisitedSet = new SET<BoardBag>();
-
+        initVisitedSet.add(initBag);
+        twinVisitedSet.add(twinBag);
 
         BoardBag goal = null;
         int moves = -1;
@@ -32,7 +36,6 @@ public class Solver {
 
             if (!initMinPq.isEmpty()){
                 BoardBag currentBoardBag = (BoardBag)initMinPq.delMin();
-                initVisitedSet.add(currentBoardBag);
                 if (currentBoardBag.mBoard.isGoal()){
                     mIsSolvable = true;
                     goal = currentBoardBag;
@@ -43,6 +46,7 @@ public class Solver {
                         BoardBag nextBag = new BoardBag(board, currentBoardBag, currentBoardBag.mMoves + 1);
                         if (!initVisitedSet.contains(nextBag)){
                             initMinPq.insert(nextBag);
+                            initVisitedSet.add(nextBag);
                         }
                     }
                 }
@@ -59,8 +63,10 @@ public class Solver {
                 else{
                     for (Board board: currentBoardBag.mBoard.neighbors()){
                         BoardBag nextBag = new BoardBag(board, currentBoardBag, currentBoardBag.mMoves + 1);
-                        if (!twinVisitedSet.contains(nextBag))
+                        if (!twinVisitedSet.contains(nextBag)){
                             twinMinPq.insert(nextBag);
+                            twinVisitedSet.add(nextBag);
+                        }
                     }
                 }
             }
