@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Collinear.iml" filepath="$PROJECT_DIR$/Collinear.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../../python/python_algorithm/opt/knapsack/knapsack.iml" filepath="$PROJECT_DIR$/../../../python/python_algorithm/opt/knapsack/knapsack.iml" />
     </modules>
   </component>
 </project>
