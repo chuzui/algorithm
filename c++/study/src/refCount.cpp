@@ -9,6 +9,45 @@
 using namespace std;
 
 static int count;
+
+template<class T>
+class RCPtr {
+public:
+	RCPtr(T* realPtr = 0);
+	RCPtr(const RCPtr& rhs);
+	~RCPtr();
+	RCPtr& operator =(const RCPtr& rhs);
+	T* operator ->() const;
+	T& operator *() const;
+private:
+	T *pointee;
+	void init();
+};
+
+template<class T>
+RCPtr<T>::RCPtr(T* realPtr) : pointee(realPtr)
+{
+	init();
+}
+
+template<class T>
+RCPtr<T>::RCPtr(const RCPtr& rhs) : pointee(rhs.pointee)
+{
+	init();
+}
+
+template<class T>
+void RCPtr<T>::init()
+{
+	if (pointee == 0) { // if the dumb pointer is
+		return; // null, so is the smart one
+	}
+	if (pointee->isShareable() == false) { // if the value
+		pointee = new T(*pointee); // isn't shareable,
+	} // copy it
+	pointee->addReference(); // note that there is now a new reference to the value
+}
+
 class String {
 public:
 	String(const char *initValue = "");
@@ -26,6 +65,7 @@ private:
 		int refCount;
 		char *data;
 		StringValue(const char *initValue);
+		StringValue(const StringValue& rhs);
 		~StringValue();
 	};
 	StringValue *value;
@@ -34,13 +74,19 @@ private:
 
 String::StringValue::StringValue(const char *initValue) : refCount(1)
 {
-	++count;
 	data = new char[strlen(initValue) + 1];
 	strcpy(data, initValue);
 }
 
+String::StringValue::StringValue(const StringValue& rhs) : refCount(1)
+{
+	data = new char[strlen(rhs.data) + 1];
+	strcpy(data, rhs.data);
+}
+
 String::StringValue::~StringValue()
 {
+	--count;
 	delete []data;
 }
 
@@ -89,11 +135,12 @@ char& String::operator[](int index)
 	return value->data[index];
 
 }
-
+/*
 int main()
 {
 	String a,b,c,d;
+	cout << count << endl;
 	a = b = c = d = "asdasd";
 	cout << count << endl;
-}
+}*/
 
