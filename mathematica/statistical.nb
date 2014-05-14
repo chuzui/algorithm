@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       157,          7]
-NotebookDataLength[     18360,        503]
-NotebookOptionsPosition[     16693,        442]
-NotebookOutlinePosition[     17217,        463]
-CellTagsIndexPosition[     17174,        460]
+NotebookDataLength[     18282,        498]
+NotebookOptionsPosition[     16659,        439]
+NotebookOutlinePosition[     17182,        460]
+CellTagsIndexPosition[     17139,        457]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -407,8 +407,6 @@ Cell[BoxData[""], "Input",
  CellChangeTimes->{{3.606541334734295*^9, 3.6065414534193015`*^9}},
  FormatType->"InputForm"],
 
-Cell[CellGroupData[{
-
 Cell[BoxData[
  FormBox[
   RowBox[{
@@ -434,14 +432,13 @@ Cell[BoxData[
 Cell[BoxData["1"], "Output",
  CellChangeTimes->{{3.606541869801261*^9, 3.606541882540989*^9}, {
    3.6065423939702415`*^9, 3.60654239762245*^9}, {3.6065424613060927`*^9, 
-   3.60654248101222*^9}, 3.6065425921655774`*^9}]
-}, Open  ]],
+   3.60654248101222*^9}, 3.6065425921655774`*^9}],
 
 Cell[BoxData[""], "Input",
  CellChangeTimes->{{3.6065414074928217`*^9, 3.6065414100512257`*^9}}]
 },
 WindowSize->{707, 637},
-WindowMargins->{{Automatic, 251}, {29, Automatic}},
+WindowMargins->{{Automatic, 71}, {34, Automatic}},
 PrintingCopies->1,
 PrintingPageRange->{32000, 32000},
 PrintingOptions->{"Magnification"->1.,
@@ -500,11 +497,9 @@ Cell[14578, 376, 521, 15, 31, "Input"],
 Cell[15102, 393, 318, 9, 31, "Output"]
 }, Open  ]],
 Cell[15435, 405, 120, 2, 31, "Input"],
-Cell[CellGroupData[{
-Cell[15580, 411, 775, 20, 54, InheritFromParent],
-Cell[16358, 433, 220, 3, 31, "Output"]
-}, Open  ]],
-Cell[16593, 439, 96, 1, 31, "Input"]
+Cell[15558, 409, 775, 20, 54, "Input"],
+Cell[16336, 431, 220, 3, 31, "Output"],
+Cell[16559, 436, 96, 1, 31, "Input"]
 }
 ]
 *)
