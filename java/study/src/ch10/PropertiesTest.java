@@ -1,4 +1,4 @@
-package l10;
+package ch10;
 
 import java.awt.EventQueue;
 import java.awt.event.*;

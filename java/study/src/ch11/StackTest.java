@@ -1,7 +1,6 @@
-package l11;
+package ch11;
 import java.util.Scanner;
 
-import static java.lang.System.out;
 /**
  * Created by Administrator on 2014/5/16.
  */
@@ -17,6 +16,7 @@ public class StackTest {
         if (n < 1) r = 1;
         else r = n * factorial(n - 1);
         System.out.println("return " + r);
+
         return r;
     }
 

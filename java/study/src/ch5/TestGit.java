@@ -1,7 +1,4 @@
-package l5;
-
-import java.lang.reflect.Array;
-import java.util.Arrays;
+package ch5;
 
 /**
  * Created by Administrator on 2014/5/14.

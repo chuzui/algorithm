@@ -1,4 +1,4 @@
-package l6;
+package ch6;
 
 import java.lang.reflect.*;
 import java.util.*;

@@ -1,4 +1,4 @@
-package l5;
+package ch5;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
