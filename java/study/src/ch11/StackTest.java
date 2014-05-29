@@ -26,5 +26,6 @@ public class StackTest {
         System.out.print("Enter n:");
         int n = in.nextInt();
         factorial(n);
+
     }
 }
