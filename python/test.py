@@ -1,10 +1,10 @@
-x = 99
-def f1():
-    x = 88
-    def f2():
-        nonlocal x
-        x = 77
-        # print(x)
-    f2()
-    print(x)
-f1()
+class A:
+    count = 0
+    def __init__(self):
+        self.count += 1
+
+a = A()
+print(a.count)
+b = A()
+print(a.count)
+print(b.count)
