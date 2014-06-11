@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 __author__ = 'Administrator'
 
 import re
@@ -12,6 +13,7 @@ addresses = ['sg1.vpnreal.com',
 
 avgRe = u'(?<=平均 = )[0-9]+'
 avgPattern = re.compile(avgRe)
+
 avgSpeedList = []
 shortestTime = 100000
 for address in addresses:
@@ -21,10 +23,11 @@ for address in addresses:
 
     print(tmpStr)
     m = avgPattern.search(tmpStr)
-    speed = int(m.group())
-    if shortestTime > speed:
-        shortestTime = speed
-        fastestAddress = address
+    if not m is None:
+        speed = int(m.group())
+        if shortestTime > speed:
+            shortestTime = speed
+            fastestAddress = address
 
 print('the fastest address is ' + fastestAddress)
 print('the average time is ' + str(shortestTime) + 'ms\n')
