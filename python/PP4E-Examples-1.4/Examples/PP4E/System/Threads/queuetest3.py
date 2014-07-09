@@ -22,8 +22,8 @@ def consumer(idnum, dataqueue):
         except queue.Empty:
             pass
         else:
-            with safeprint:
-                print('consumer', idnum, 'got =>', data)
+            #with safeprint:
+            print('consumer', idnum, 'got =>', data)
 
 if __name__ == '__main__':
     for i in range(numconsumers):

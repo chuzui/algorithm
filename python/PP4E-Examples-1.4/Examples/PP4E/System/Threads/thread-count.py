@@ -16,4 +16,4 @@ for i in range(5):                               # spawn 5 threads
     thread.start_new_thread(counter, (i, 5))     # each thread loops 5 times
 
 time.sleep(6)
-print('Main thread exiting.')                    # don't exit too early
+print('Main  11 thread exiting.')                    # don't exit too early
