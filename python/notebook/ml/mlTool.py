@@ -1,9 +1,23 @@
-__author__ = 'Administrator'
-
+__author__ = 'chuzui'
 from scipy import *
 import numpy as np
-import scipy.io as sio
 from scipy import linalg
+
+def fisherLdaFit(Xtrain, ytrain):
+    C = max(ytrain)
+
+    if C == 2:
+        ndx1 = nonzero(ytrain == 1)
+        ndx2 = nonzero(ytrain == 2)
+
+        m1 = mean(Xtrain[ndx1[0], :], 0)
+        m2 = mean(Xtrain[ndx2[0], :], 0)
+        s1 = cov(Xtrain[ndx1[0], :].T, bias=1)
+        s2 = cov(Xtrain[ndx2[0], :].T, bias=1)
+        sw = s1+ s2
+        W = linalg.inv(sw).dot(m1 - m2)
+    Z = Xtrain * W
+    return W, Z
 
 def PCA(X, K, method=None):
     n, d = X.shape
@@ -33,14 +47,3 @@ def centerCols(X, mu=None):
         mu = mean(X, 0)
     X = X - mu
     return X, mu
-
-
-if __name__ == '__main__':
-    dataPath = 'data/vowelTrain.mat'
-    data = sio.loadmat(dataPath)
-    Xtrain = data['Xtrain']
-    ytrain = data['ytrain']
-    B, Z = PCA(Xtrain, 2)
-
-
-
