@@ -1,0 +1,3 @@
+team_data
+A = sparse(1:m,train(:,1),train(:,3),m,n) + ...
+    sparse(1:m,train(:,2),-train(:,3),m,n);
