@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.sparse as sp
+from sklearn.preprocessing import StandardScaler
 
 def _transY(y, classes):
     N = y.shape[0]
@@ -8,6 +9,7 @@ def _transY(y, classes):
     for i, yi in enumerate(y):
         Y[i, yi] = 1
     return Y
+
 
 def _discretize(x):
     min = x.min(axis = 0)
@@ -22,6 +24,11 @@ def _discretize(x):
 
 
 def NBD(XTrain, y, XTest):
+    scaler = StandardScaler(with_mean=False)
+    scaler.fit(XTrain)  # Don't cheat - fit only on training data
+    X_train = scaler.transform(XTrain)
+    X_test = scaler.transform(XTest)  # apply same transformation to test data
+
     N = XTrain.shape[0]
     P = XTrain.shape[1]
     classes = np.lib.arraysetops.unique(y)

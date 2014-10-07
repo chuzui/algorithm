@@ -2,6 +2,7 @@ import numpy.random as nrandom
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 
+
 def tenFoldCV(X, y, func=None):
     N = X.shape[0]
     index = range(N)
@@ -20,6 +21,7 @@ def tenFoldCV(X, y, func=None):
             yPred = np.ravel(func(XTrain, yTrain, XTest))
             yTest = np.ravel(yTest)
             acc.append(float(np.sum(yTest == yPred)) / len(yTest))
+            print acc[i]
         else:
             cl = LogisticRegression()
             yTrain = np.ravel(yTrain)
