@@ -7,12 +7,20 @@ import logistic
 import scipy.sparse as sp
 import cProfile
 import pstats
-def norm(X):
-    X.data = X.data ** 2
-    t = np.sqrt(X.sum(axis=0))
-    t[t==0] = 1
-    X = X / t
-    return sp.csr_matrix(X)
+import time
+import lsh
+
+def genQ(X, y):
+    C = 10
+    N = 20
+    P = X.shape[1]
+    Q = np.zeros((C * N, P), dtype=np.float64)
+    qY = []
+    for i in range(C):
+        Q[i * N:(i + 1) * N, :] += X[np.nonzero(y == i)[0][:20], :]
+        for j in range(N):
+            qY.append(i)
+    return sp.csr_matrix(Q), np.array(qY)
 
 
 tfDataFile = 'data\\tfData'
@@ -24,11 +32,15 @@ XTfidf = sparseIO.load_sparse_matrix(tfidfDataFile + '.npz').tocsr()
 y = np.load(yDataFile)
 
 
-# pr = cProfile.Profile()
-# pr.enable()
-tenFoldCV(XTfidf, y, logistic.SGDLR)
-# pr.disable()
-# sortby = 'cumtime'
-# ps = pstats.Stats(pr).sort_stats(sortby)
-# ps.print_stats()
+# Q = genQ(XTfidf, y)
+Q = XTfidf, y
+K = [10,20,30,40,50]
+
+print 'brute force:'
+for k in K:
+    start = time.time()
+    lsh.test(Q, k, 'bf')
+    elapsed = (time.time() - start)
+    print 'time = ', elapsed
+
 

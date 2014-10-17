@@ -13,7 +13,7 @@ def _transY(y, classes):
     Y = sp.lil_matrix((N, C))
     for i, yi in enumerate(y):
         Y[i, yi] = 1
-    return Y.tocsr()
+    return sp.csr_matrix(Y)
 
 def _norm(X):
     min = X.min(axis=0)
@@ -27,10 +27,11 @@ def _norm(X):
     # X = X / np.sqrt(varX)
     return sp.csr_matrix(X)
 
-def SGDLR(XTrain, yTrain, XTest, mu = 0 ):
+def SGDLR(XTrain, yTrain, XTest, mu = 0.05, maxIter = 3):
     classes = np.lib.arraysetops.unique(yTrain)
     XTrain = _norm(XTrain.todense())
     XTrain = _addOnes(XTrain.todense())
+    #XTest = _norm(XTest.todense())
     XTest = _addOnes(XTest.todense())
     yTrain = _transY(yTrain, classes)
     C = len(classes)
@@ -38,10 +39,9 @@ def SGDLR(XTrain, yTrain, XTest, mu = 0 ):
 
     beta = np.zeros((P, C-1), dtype=np.float64)
     grad = np.zeros((P, C-1), dtype=np.float64)
-    maxIter = 10
 
     for i in xrange(maxIter):
-        lamda = 0.1 / (i + 2)
+        lamda = 0.1 / (i + 1)
     #     t = np.exp(XTrain.dot(beta))
     #     prob = t / np.atleast_2d((t.sum(axis = 1) + 1)).T
     #     grad = XTrain.T.dot(yTrain[:, :C-1] - prob) -  mu * np.abs(beta)
@@ -51,7 +51,7 @@ def SGDLR(XTrain, yTrain, XTest, mu = 0 ):
             x = XTrain[j, :]
             t = np.exp(x * beta)
             prob = t / (t.sum() + 1)
-            grad = x.T.dot(yTrain[j, :C-1] - prob) -  2 * mu * beta
+            grad = x.T.dot(yTrain[j, :C-1] - prob) # -  2 * mu * beta
             beta += lamda * grad
 
     t = np.exp(XTest.dot(beta))
