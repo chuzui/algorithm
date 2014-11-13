@@ -9,38 +9,27 @@ import cProfile
 import pstats
 import time
 import lsh
-
-def genQ(X, y):
-    C = 10
-    N = 20
-    P = X.shape[1]
-    Q = np.zeros((C * N, P), dtype=np.float64)
-    qY = []
-    for i in range(C):
-        Q[i * N:(i + 1) * N, :] += X[np.nonzero(y == i)[0][:20], :]
-        for j in range(N):
-            qY.append(i)
-    return sp.csr_matrix(Q), np.array(qY)
-
-
+import cluster
+from sklearn.metrics.cluster import normalized_mutual_info_score
+from sklearn.cluster import KMeans
+import numpy.random as nrandom
+from sklearn import tree
 tfDataFile = 'data\\tfData'
 tfidfDataFile = 'data\\tfidfData'
 yDataFile = 'data\\y.npy'
 
 XTf = sparseIO.load_sparse_matrix(tfDataFile + '.npz').tocsr()
 XTfidf = sparseIO.load_sparse_matrix(tfidfDataFile + '.npz').tocsr()
-y = np.load(yDataFile)
+y = np.ravel(np.load(yDataFile))
 
 
-# Q = genQ(XTfidf, y)
-Q = XTfidf, y
-K = [10,20,30,40,50]
-
-print 'brute force:'
-for k in K:
-    start = time.time()
-    lsh.test(Q, k, 'bf')
-    elapsed = (time.time() - start)
-    print 'time = ', elapsed
+# for k in range(2,21):
+#     for i in range(1000):
+#         nmi = []
+#         ypred = np.ravel(cluster.kMeans(XTfidf, 10, y))
+#         nmi.append(normalized_mutual_info_score(y, ypred))
+#     print k
+#     print max(nmi)
 
 
+cluster.fastCluster(XTfidf, y)

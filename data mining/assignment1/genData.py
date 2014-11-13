@@ -4,6 +4,7 @@ import tfidf
 import sparseIO
 import jieba
 dirPath = 'lily'
+
 def readFile(filePath):
     fileName = os.path.basename(filePath).split('.')[0]
     with open(filePath) as f:
@@ -69,4 +70,14 @@ def genTfidfData():
     sparseIO.save_sparse_matrix(tfDataFile, XTf)
     np.save('y', y)
 
-genTfidfData()
+def loadFile(filePath):
+    with open(filePath) as f:
+        typeList = map(int, f.readline().split(',')[:-1])
+        data = [map(float, l.split(',')) for l in f.readlines()]
+        X = np.array([r[:-1] for r in data])
+        y = np.array([r[-1] for r in data])
+        return typeList, X, y
+
+def loadBreastData():
+    return loadFile('data\\breast-cancer.data')
+
