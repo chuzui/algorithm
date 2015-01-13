@@ -76,8 +76,22 @@ def loadFile(filePath):
         data = [map(float, l.split(',')) for l in f.readlines()]
         X = np.array([r[:-1] for r in data])
         y = np.array([r[-1] for r in data])
-        return typeList, X, y
+        return X, y
 
 def loadBreastData():
-    return loadFile('data\\breast-cancer.data')
+    X, y = loadFile('data\\breast-cancer.data')
+    y = np.array(y, dtype=np.int64)
+    return X, y
 
+def loadSegmentData():
+    X, y = loadFile('data\\segment.data')
+    y = np.array(y, dtype=np.int64)
+    return X, y
+
+def loadHousingData():
+    X, y = loadFile('data\\housing.data')
+    return X, y
+
+def loadMetaData():
+    X, y = loadFile('data\\meta.data')
+    return X, y
