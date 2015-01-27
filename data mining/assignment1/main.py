@@ -9,38 +9,29 @@ import cProfile
 import pstats
 import time
 import lsh
-
-def genQ(X, y):
-    C = 10
-    N = 20
-    P = X.shape[1]
-    Q = np.zeros((C * N, P), dtype=np.float64)
-    qY = []
-    for i in range(C):
-        Q[i * N:(i + 1) * N, :] += X[np.nonzero(y == i)[0][:20], :]
-        for j in range(N):
-            qY.append(i)
-    return sp.csr_matrix(Q), np.array(qY)
-
+import cluster
+from sklearn.metrics.cluster import normalized_mutual_info_score
+from sklearn.cluster import KMeans
+import numpy.random as nrandom
+from sklearn import tree
+import tree
+import genData
+import ensemble
+from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import f_classif
 
 tfDataFile = 'data\\tfData'
 tfidfDataFile = 'data\\tfidfData'
 yDataFile = 'data\\y.npy'
 
+print 'lily DT'
 XTf = sparseIO.load_sparse_matrix(tfDataFile + '.npz').tocsr()
 XTfidf = sparseIO.load_sparse_matrix(tfidfDataFile + '.npz').tocsr()
-y = np.load(yDataFile)
+y = np.ravel(np.load(yDataFile))
+#X_new = SelectKBest(f_classif, k=2000).fit_transform(XTfidf.todense(), y)
+
+tenFoldCV(XTfidf.todense(), y, ensemble.adaboost)
 
 
-# Q = genQ(XTfidf, y)
-Q = XTfidf, y
-K = [10,20,30,40,50]
-
-print 'brute force:'
-for k in K:
-    start = time.time()
-    lsh.test(Q, k, 'bf')
-    elapsed = (time.time() - start)
-    print 'time = ', elapsed
 
 

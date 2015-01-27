@@ -218,3 +218,7 @@ pip-log.txt
 
 #intellij
 .idea/
+
+*.docx
+*.zip
+*.csv

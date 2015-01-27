@@ -3,7 +3,7 @@ import jieba
 import numpy as np
 import scipy.sparse as sp
 
-stopwordsPath = 'data\\stopwords.txt'
+stopwordsPath = 'dict\\stopwords.txt'
 STOP_WORDS = set()
 with open(stopwordsPath) as f:
     for l in f:
