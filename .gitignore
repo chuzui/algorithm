@@ -222,3 +222,12 @@ pip-log.txt
 *.docx
 *.zip
 *.csv
+*.ipynb
+*.tar.gz
+cnn/assignment2/cs231n/datasets/cifar-10-batches-py/data_batch_1
+cnn/assignment2/cs231n/datasets/cifar-10-batches-py/data_batch_2
+cnn/assignment2/cs231n/datasets/cifar-10-batches-py/data_batch_3
+cnn/assignment2/cs231n/datasets/cifar-10-batches-py/data_batch_4
+cnn/assignment2/cs231n/datasets/cifar-10-batches-py/data_batch_5
+cnn/assignment2/cs231n/datasets/cifar-10-batches-py/readme.html
+cnn/assignment2/cs231n/datasets/cifar-10-batches-py/test_batch
