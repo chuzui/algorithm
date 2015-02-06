@@ -42,7 +42,7 @@ T parallel_accumulate(Iterator first, Iterator last, T init)
 
 }
 
-int tmain1()
+int main()
 {
 	vector<char> a(1000000000, 1);
 	clock_t t1 = clock();
