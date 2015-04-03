@@ -1,0 +1,327 @@
+
+
+<html>
+<head>
+    <title>Convolution demo</title>
+
+    <script type="text/javascript" src="jslib/d3.min.js"></script>
+    <script type="text/javascript" src="jslib/utils.js"></script>
+
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+
+    <script type="text/javascript">
+
+        var W1 = 7;
+        var H1 = 7;
+        var D1 = 3;
+
+        var K = 2;
+        var F = 3;
+        var S = 2; // stride
+
+        var cs = 25; // cell size
+
+        var X = new U.Vol(W1, H1, D1); // input volume
+        for(var q=0;q<X.w.length;q++) {
+            X.w[q] = Math.floor(Math.random()*3);
+            // 0 pad with P = 1
+            for(var d=0;d<X.depth;d++) {
+                for(var x=0;x<X.sx;x++) {
+                    for(var y=0;y<X.sy;y++) {
+                        if(x === 0 || x === (X.sx - 1) || y === 0 || y === (X.sy - 1)) {
+                            X.set(x,y,d,0);
+                        }
+                    }
+                }
+            }
+        }
+
+        var Ws = [];
+        var bs = [];
+        for(var k=0;k<K;k++) {
+            var W = new U.Vol(F, F, D1);
+            for(var q=0;q<W.w.length;q++) {
+                W.w[q] = Math.floor(Math.random()*3) - 1;
+            }
+            Ws.push(W);
+            var b = new U.Vol(1,1,1);
+            b.w[0] = 1 - k;
+            bs.push(b);
+        }
+
+        var conv_forward = function(V, Ws, bs, stride) {
+            // optimized code by @mdda that achieves 2x speedup over previous version
+            var out_sy = ((V.sy-W.sy)/stride +1);
+            var out_sx = ((V.sx-W.sx)/stride +1);
+            var A = new U.Vol(out_sx |0, out_sy |0, Ws.length |0, 0.0);
+
+            var V_sx = V.sx |0;
+            var V_sy = V.sy |0;
+            var xy_stride = stride |0;
+
+            for(var d=0;d<Ws.length;d++) {
+                var f = Ws[d];
+                var x = 0;
+                var y = 0;
+                for(var ay=0; ay<out_sy; y+=xy_stride,ay++) {  // xy_stride
+                    x = 0;
+                    for(var ax=0; ax<out_sx; x+=xy_stride,ax++) {  // xy_stride
+
+                        // convolve centered at this particular location
+                        var a = 0.0;
+                        for(var fy=0;fy<f.sy;fy++) {
+                            var oy = y+fy; // coordinates in the original input array coordinates
+                            for(var fx=0;fx<f.sx;fx++) {
+                                var ox = x+fx;
+                                if(oy>=0 && oy<V_sy && ox>=0 && ox<V_sx) {
+                                    for(var fd=0;fd<f.depth;fd++) {
+                                        // avoid function call overhead (x2) for efficiency, compromise modularity :(
+                                        a += f.w[((f.sx * fy)+fx)*f.depth+fd] * V.w[((V_sx * oy)+ox)*V.depth+fd];
+                                    }
+                                }
+                            }
+                        }
+                        a += bs[d].w[0];
+                        A.set(ax, ay, d, a);
+                    }
+                }
+            }
+            return A;
+        }
+
+        function renderVol(svg, V, xoff, yoff, col, title, vid) {
+
+            var pad = 3;
+            var dpad = 20;
+
+            var gyoff = 20;
+
+            var txt = title + ' (' + V.sx + 'x' + V.sy + 'x' + V.depth + ')';
+            // 1 padding exception
+            //if(vid === 'x') { txt = title + ' (' + (V.sx-2) + 'x' + (V.sy-2) + 'x' + V.depth + ')'; }
+
+            svg.append('text')
+                    .attr('x', xoff)
+                    .attr('y', yoff - 5)
+                    .attr('font-size', 16)
+                    .attr('fill', 'black')
+                    .text(txt);
+
+            for(var d = 0; d < V.depth; d++) {
+
+                svg.append('text')
+                        .attr('x', xoff)
+                        .attr('y', yoff + d * (V.sy * (cs + pad) + dpad) + gyoff - 5)
+                        .attr('font-size', 16)
+                        .attr('fill', 'black')
+                        .attr('style', 'font-family: courier;')
+                        .text(vid + '[:,:,'+d+']');
+
+                for(var x = 0; x < V.sx; x++) {
+                    for(var y = 0; y < V.sy; y++) {
+
+                        var xcoord = xoff + x * (cs + pad);
+                        var ycoord = yoff + y * (cs + pad) + d * (V.sy * (cs + pad) + dpad) + gyoff;
+
+                        var thecol = col;
+                        if(vid === 'x' && (x === 0 || y === 0 || x === V.sx - 1 || y === V.sy - 1)) {thecol = '#DDD';}
+
+                        svg.append('rect')
+                                .attr('x', xcoord)
+                                .attr('y', ycoord)
+                                .attr('height', cs)
+                                .attr('width', cs)
+                                .attr('fill', thecol)
+                                .attr('stroke', 'none')
+                                .attr('stroke-width', '2')
+                                .attr('id', vid+'_'+x+'_'+y+'_'+d)
+                                .attr('class', vid);
+
+                        svg.append('text')
+                                .attr('x', xcoord + 5)
+                                .attr('y', ycoord + 15)
+                                .attr('font-size', 16)
+                                .attr('fill', 'black')
+                                .text(V.get(x,y,d).toFixed(0));
+
+                    }
+                }
+            }
+        }
+
+        function draw() {
+            var d3elt = d3.select('#draw');
+            svg = d3elt.append('svg').attr('width', '100%').attr('height', '100%')
+                    .append('g').attr('transform', 'scale(1)');
+
+            var yoff = 20;
+            // render input volume
+            renderVol(svg, X, 10, yoff, '#DDF', 'Input Volume (+pad 1)', 'x');
+
+            for(var i=0;i<Ws.length;i++) {
+                // render weights
+                renderVol(svg, Ws[i], 270 + i*170, yoff, '#FDD', 'Filter W'+i, 'w'+i);
+                // render biases
+                renderVol(svg, bs[i], 270 + i*170, 350 + yoff, '#FDD', 'Bias b'+i, 'b'+i);
+            }
+
+            // render output
+            renderVol(svg, O, 600, yoff, '#DFD', 'Output Volume', 'o');
+
+            // render controls
+
+            svg.append('text')
+                    .attr('x', 520)
+                    .attr('y', 470)
+                    .attr('font-size', 16)
+                    .attr('fill', 'black')
+                    .text('toggle movement');
+            svg.append('rect')
+                    .attr('x', 500)
+                    .attr('y', 450)
+                    .attr('height', 30)
+                    .attr('width', 150)
+                    .attr('fill', "rgba(200, 200, 200, 0.1)")
+                    .attr('stroke', 'black')
+                    .attr('stroke-width', '2')
+                    .attr('style', 'cursor:pointer;')
+                    .on('click', function() {
+                        // toggle
+                        if(iid === -1) {
+                            iid = setInterval(focusCell, 1000);
+                        } else {
+                            clearInterval(iid);
+                            iid = -1;
+                        }
+                    });
+        }
+
+        var fxg = 0;
+        var fyg = 0;
+        var fdg = 0;
+        function focusCell() {
+
+            // first unfocus all
+            for(var i=0;i<Ws.length;i++) {
+                d3.selectAll('.w'+i).attr('stroke', 'none');
+                d3.selectAll('.b'+i).attr('stroke', 'none');
+            }
+            d3.selectAll('.x').attr('stroke', 'none');
+            d3.selectAll('.o').attr('stroke', 'none');
+
+            var fx = fxg;
+            var fy = fyg;
+            var fd = fdg;
+
+            // highlight the output cell
+            var csel = d3.select('#o'+'_'+fx+'_'+fy+'_'+fd);
+            csel.attr('stroke', '#0A0');
+
+            // highlight the weights
+            d3.selectAll('.w'+fd).attr('stroke', '#A00');
+            // highlight the bias
+            d3.selectAll('.b'+fd).attr('stroke', '#A00');
+
+            d3.selectAll('.ll').remove();
+
+            // highlight the input cell
+            for(var d=0;d<D1;d++) {
+                for(var x=0;x<F;x++) {
+                    for(var y=0;y<F;y++) {
+                        var ix = fx * S + x;
+                        var iy = fy * S + y;
+                        var id = d;
+                        var csel = d3.select('#x'+'_'+ix+'_'+iy+'_'+id);
+                        csel.attr('stroke', '#00A');
+
+                        // connect with line
+                        if(x === 0 && y === 0) {
+                            var wsel = d3.select('#w'+fd+'_'+x+'_'+y+'_'+d);
+                            svg.append('line')
+                                    .attr('x1', csel.attr('x'))
+                                    .attr('y1', csel.attr('y'))
+                                    .attr('x2', wsel.attr('x'))
+                                    .attr('y2', wsel.attr('y'))
+                                    .attr('stroke', 'black')
+                                    .attr('stroke-width', '1')
+                                    .attr('class', 'll');
+                        }
+                        if(x === 0 && y === (F-1)) {
+                            var wsel = d3.select('#w'+fd+'_'+x+'_'+y+'_'+d);
+                            svg.append('line')
+                                    .attr('x1', csel.attr('x'))
+                                    .attr('y1', parseFloat(csel.attr('y')) + cs)
+                                    .attr('x2', wsel.attr('x'))
+                                    .attr('y2', parseFloat(wsel.attr('y')) + cs)
+                                    .attr('stroke', 'black')
+                                    .attr('stroke-width', '1')
+                                    .attr('class', 'll');
+                        }
+                        if(x === (F-1) && y === 0) {
+                            var wsel = d3.select('#w'+fd+'_'+x+'_'+y+'_'+d);
+                            svg.append('line')
+                                    .attr('x1', parseFloat(csel.attr('x')) + cs)
+                                    .attr('y1', csel.attr('y'))
+                                    .attr('x2', parseFloat(wsel.attr('x')) + cs)
+                                    .attr('y2', wsel.attr('y'))
+                                    .attr('stroke', 'black')
+                                    .attr('stroke-width', '1')
+                                    .attr('class', 'll');
+                        }
+                        if(x === (F-1) && y === (F-1)) {
+                            var wsel = d3.select('#w'+fd+'_'+x+'_'+y+'_'+d);
+                            svg.append('line')
+                                    .attr('x1', parseFloat(csel.attr('x')) + cs)
+                                    .attr('y1', parseFloat(csel.attr('y')) + cs)
+                                    .attr('x2', parseFloat(wsel.attr('x')) + cs)
+                                    .attr('y2', parseFloat(wsel.attr('y')) + cs)
+                                    .attr('stroke', 'black')
+                                    .attr('stroke-width', '1')
+                                    .attr('class', 'll');
+                        }
+
+                    }
+                }
+            }
+
+            // output focus cycle
+            fxg++;
+            if(fxg >= O.sx) {
+                fxg = 0;
+                fyg++;
+                if(fyg >=O.sy) {
+                    fyg = 0;
+                    fdg++;
+                    if(fdg >= O.depth) {
+                        fdg = 0;
+                    }
+                }
+            }
+
+        }
+
+        iid = -1;
+        function start() {
+            O = conv_forward(X, Ws, bs, S);
+            draw();
+            iid = setInterval(focusCell, 1000);
+        }
+
+    </script>
+
+
+
+</head>
+
+<body onload="start()">
+<img src="data:image/png;base64,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">
+<div id="draw">
+</div>
+
+</body>
+</html>

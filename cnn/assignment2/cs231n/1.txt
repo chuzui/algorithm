@@ -1,0 +1,20 @@
+running build_ext
+building 'im2col_cython' extension
+C:\MinGW\bin\gcc.exe -DMS_WIN64 -mdll -O -Wall -IC:\Users\chuzui\Anaconda\lib\site-packages\numpy\core\include -IC:\Users\chuzui\Anaconda\include -IC:\Users\chuzui\Anaconda\PC -c im2col_cython.c -o build\temp.win-amd64-2.7\Release\im2col_cython.o
+writing build\temp.win-amd64-2.7\Release\im2col_cython.def
+C:\MinGW\bin\gcc.exe -DMS_WIN64 -shared -s build\temp.win-amd64-2.7\Release\im2col_cython.o build\temp.win-amd64-2.7\Release\im2col_cython.def -LC:\Users\chuzui\Anaconda\libs -LC:\Users\chuzui\Anaconda\PCbuild\amd64 -lpython27 -lmsvcr90 -o D:\workplace\algorithm\cnn\assignment2\cs231n\im2col_cython.pyd
+running build_ext
+building 'im2col_cython' extension
+C:\MinGW\bin\gcc.exe -DMS_WIN64 -mdll -O -Wall -IC:\Users\chuzui\Anaconda\lib\site-packages\numpy\core\include -IC:\Users\chuzui\Anaconda\include -IC:\Users\chuzui\Anaconda\PC -c im2col_cython.c -o build\temp.win-amd64-2.7\Release\im2col_cython.o
+writing build\temp.win-amd64-2.7\Release\im2col_cython.def
+C:\MinGW\bin\gcc.exe -DMS_WIN64 -shared -s build\temp.win-amd64-2.7\Release\im2col_cython.o build\temp.win-amd64-2.7\Release\im2col_cython.def -LC:\Users\chuzui\Anaconda\libs -LC:\Users\chuzui\Anaconda\PCbuild\amd64 -lpython27 -lmsvcr90 -o D:\workplace\algorithm\cnn\assignment2\cs231n\im2col_cython.pyd
+running build_ext
+building 'im2col_cython' extension
+C:\MinGW\bin\gcc.exe -DMS_WIN64 -mdll -O -Wall -IC:\Users\chuzui\Anaconda\lib\site-packages\numpy\core\include -IC:\Users\chuzui\Anaconda\include -IC:\Users\chuzui\Anaconda\PC -c im2col_cython.c -o build\temp.win-amd64-2.7\Release\im2col_cython.o
+writing build\temp.win-amd64-2.7\Release\im2col_cython.def
+C:\MinGW\bin\gcc.exe -DMS_WIN64 -shared -s build\temp.win-amd64-2.7\Release\im2col_cython.o build\temp.win-amd64-2.7\Release\im2col_cython.def -LC:\Users\chuzui\Anaconda\libs -LC:\Users\chuzui\Anaconda\PCbuild\amd64 -lpython27 -lmsvcr90 -o D:\workplace\algorithm\cnn\assignment2\cs231n\im2col_cython.pyd
+running build_ext
+building 'im2col_cython' extension
+C:\MinGW\bin\gcc.exe -DMS_WIN64 -mdll -O -Wall -IC:\Users\chuzui\Anaconda\lib\site-packages\numpy\core\include -IC:\Users\chuzui\Anaconda\include -IC:\Users\chuzui\Anaconda\PC -c im2col_cython.c -o build\temp.win-amd64-2.7\Release\im2col_cython.o
+writing build\temp.win-amd64-2.7\Release\im2col_cython.def
+C:\MinGW\bin\gcc.exe -DMS_WIN64 -shared -s build\temp.win-amd64-2.7\Release\im2col_cython.o build\temp.win-amd64-2.7\Release\im2col_cython.def -LC:\Users\chuzui\Anaconda\libs -LC:\Users\chuzui\Anaconda\PCbuild\amd64 -lpython27 -lmsvcr90 -o D:\workplace\algorithm\cnn\assignment2\cs231n\im2col_cython.pyd
