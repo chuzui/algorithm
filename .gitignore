@@ -222,7 +222,7 @@ pip-log.txt
 *.docx
 *.zip
 *.csv
-*.ipynb
+.ipynb_checkpoints/
 *.tar.gz
 cnn/assignment2/cs231n/datasets/cifar-10-batches-py/data_batch_1
 cnn/assignment2/cs231n/datasets/cifar-10-batches-py/data_batch_2
