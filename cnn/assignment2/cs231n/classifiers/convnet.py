@@ -108,7 +108,7 @@ def init_two_layer_convnet(weight_scale=1e-3, bias_scale=0, input_shape=(3, 32, 
 
 def deep_convnet(X, model, y=None, reg=0.0):
     W1, b1, W2, b2, W3, b3 = model['W1'], model['b1'], model['W2'], model['b2'], model['W3'], model['b3']
-    W4, b4= model['W4'], model['b4']#, model['W5'], model['b5']
+    W4, b4, W5, b5= model['W4'], model['b4'], model['W5'], model['b5']
     N, C, H, W = X.shape
 
     # We assume that the convolution is "same", so that the data has the same
@@ -123,11 +123,10 @@ def deep_convnet(X, model, y=None, reg=0.0):
 
     # Compute the forward pass
     a1, cache1 = conv_relu_pool_forward(X, W1, b1, conv_param, pool_param)
-
     a2, cache2 = conv_relu_pool_forward(a1, W2, b2, conv_param, pool_param)
     a3, cache3 = conv_relu_pool_forward(a2, W3, b3, conv_param, pool_param)
-    #a4, cache4 = affine_forward(a3, W4, b4)
-    scores, cache4 = affine_forward(a3, W4, b4)
+    a4, cache4 = affine_forward(a3, W4, b4)
+    scores, cache5 = affine_forward(a4, W5, b5)
 
     if y is None:
         return scores
@@ -136,8 +135,8 @@ def deep_convnet(X, model, y=None, reg=0.0):
     data_loss, dscores = softmax_loss(scores, y)
 
     # Compute the gradients using a backward pass
-    #da4, dW5, db5 = affine_backward(dscores, cache5)
-    da3, dW4, db4 = affine_backward(dscores, cache4)
+    da4, dW5, db5 = affine_backward(dscores, cache5)
+    da3, dW4, db4 = affine_backward(da4, cache4)
     da2, dW3, db3 = conv_relu_pool_backward(da3, cache3)
     da1, dW2, db2 = conv_relu_pool_backward(da2, cache2)
     dX, dW1, db1 = conv_relu_pool_backward(da1, cache1)
@@ -147,17 +146,17 @@ def deep_convnet(X, model, y=None, reg=0.0):
     dW2 += reg * W2
     dW3 += reg * W3
     dW4 += reg * W4
-    #dW5 += reg * W5
-    reg_loss = 0.5 * reg * sum(np.sum(W * W) for W in [W1, W2, W3, W4])
+    dW5 += reg * W5
+    reg_loss = 0.5 * reg * sum(np.sum(W * W) for W in [W1, W2, W3, W4, W5])
 
     loss = data_loss + reg_loss
-    grads = {'W1': dW1, 'b1': db1, 'W2': dW2, 'b2': db2, 'W3': dW3, 'b3': db3, 'W4': dW4, 'b4': db4}#,'W5': dW5, 'b5': db5}
+    grads = {'W1': dW1, 'b1': db1, 'W2': dW2, 'b2': db2, 'W3': dW3, 'b3': db3, 'W4': dW4, 'b4': db4, 'W5': dW5, 'b5': db5}
 
     return loss, grads
 
 
 def init_deep_convnet(weight_scale=1e-3, bias_scale=0, input_shape=(3, 32, 32),
-                      num_classes=10, num_filters=32, filter_size=5):
+                      num_classes=10, num_filters=32, filter_size=3):
     C, H, W = input_shape
     assert filter_size % 2 == 1, 'Filter size must be odd; got %d' % filter_size
 
@@ -165,18 +164,25 @@ def init_deep_convnet(weight_scale=1e-3, bias_scale=0, input_shape=(3, 32, 32),
     M = 2
 
     model = {}
+    w_init = lambda n: np.sqrt(2.0 / n)
 
-    model['W1'] = weight_scale * np.random.randn(num_filters, C, filter_size, filter_size)
+    weight1 = w_init(C * filter_size * filter_size)
+    model['W1'] = weight1 * np.random.randn(num_filters, C, filter_size, filter_size)
     model['b1'] = bias_scale * np.random.randn(num_filters)
-    model['W2'] = weight_scale * np.random.randn(num_filters, num_filters, filter_size, filter_size)
+
+    weight2 = w_init(num_filters * filter_size * filter_size)
+    model['W2'] = weight2 * np.random.randn(num_filters, num_filters, filter_size, filter_size)
     model['b2'] = bias_scale * np.random.randn(num_filters)
-    model['W3'] = weight_scale * np.random.randn(num_filters, num_filters, filter_size, filter_size)
+    model['W3'] = weight2 * np.random.randn(num_filters, num_filters, filter_size, filter_size)
     model['b3'] = bias_scale * np.random.randn(num_filters)
 
-    # model['W4'] = weight_scale * np.random.randn(num_filters * 4 * H * W / 64, 4096)
-    # model['b4'] = bias_scale * np.random.randn(4096)
-    model['W4'] = weight_scale * np.random.randn(num_filters *  H * W / 64, num_classes)
-    model['b4'] = bias_scale * np.random.randn(num_classes)
+    weight3 = w_init(num_filters *  H * W / 64)
+    model['W4'] = weight_scale * np.random.randn(num_filters  * H * W / 64, 1024)
+    model['b4'] = bias_scale * np.random.randn(1024)
+
+    weight4 = w_init(1024)
+    model['W5'] = weight4 * np.random.randn(1024, num_classes)
+    model['b5'] = bias_scale * np.random.randn(num_classes)
 
     return model
 
@@ -192,7 +198,7 @@ if __name__ == '__main__':
     X = np.random.randn(num_inputs, *input_shape)
     y = np.random.randint(num_classes, size=num_inputs)
 
-    model = init_deep_convnet(weight_scale = 1e-1, num_filters=3, filter_size=3, input_shape=input_shape)
+    model = init_deep_convnet( num_filters=3, filter_size=3, input_shape=input_shape)
     loss, grads = deep_convnet(X, model, y)
     for param_name in sorted(grads):
         f = lambda _: deep_convnet(X, model, y)[0]

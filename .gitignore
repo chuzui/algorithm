@@ -231,3 +231,5 @@ cnn/assignment2/cs231n/datasets/cifar-10-batches-py/data_batch_4
 cnn/assignment2/cs231n/datasets/cifar-10-batches-py/data_batch_5
 cnn/assignment2/cs231n/datasets/cifar-10-batches-py/readme.html
 cnn/assignment2/cs231n/datasets/cifar-10-batches-py/test_batch
+
+stanfordSentimentTreebank/

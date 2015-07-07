@@ -1,70 +1,5 @@
 import numpy as np
 
-OF_THE_INPUTS__ = """
-  Convert a 4D array of independent 3D inputs into a single 2D array where each
-  column is a receptive field of one of the inputs.
-
-  The input x has shape (N, C, H, W); this should be interpreted as N
-  independent inputs, each with height H, width H, and C channels.
-
-  A receptive field of a single input is a rectangular block that spans all
-  channels and whose height and width are given by field_height and field_width
-  respectively. We imagine sliding these receptive fields over each of the
-  inputs, where the horizontal and vertical offset between each receptive field
-  is given by the stride parameter.
-
-  Before extracting receptive fields, we also zero-pad the top, bottom,
-  left, and right of each input with zeros.
-
-  We will use this to efficiently implement convolution and pooling layers.
-
-  As a simple example, we run the following matrix through im2col with
-  field_height=field_width=2, padding=1, and stride=1:
-
-  [1 2]
-  [3 4]
-
-  We would first pad the matrix with 0, giving the following:
-
-  [0 0 0 0]
-  [0 1 2 0]
-  [0 3 4 0]
-  [0 0 0 0]
-
-  We would then slide a 2x2 window over this padded array, and reshape each
-  window to a column, producing the following:
-
-  [0 0 0 0 1 2 0 3 4]
-  [0 0 0 1 2 0 3 4 0]
-  [0 1 2 0 3 4 0 0 0]
-  [1 2 0 3 4 0 0 0 0]
-
-  You should use the field_coords generator function from above to iterate over
-  receptive fields. So that downstream reshape operations work properly, you
-  should iterate first over receptive fields and then over inputs. In other
-  words, you should have a loop that looks like this:
-
-  next_col = 0
-  for y0, y1, x0, x1 in field_coords(params):
-    for i in xrange(num_inputs):
-      cols[:, next_col] = [something]
-      next_col += 1
-
-  Inputs:
-  - x: 4D array of shape (N, C, H, W). This should be interpreted as N
-    independent inputs, each with height H, width W, and C channels.
-  - field_height: Integer; height of each receptive field
-  - field_width: Intger; width of each receptive field
-  - padding: The number of pixels of zero-padding to apply to x before
-    extracting receptive fields.
-  - stride: The horizontal and vertical offsets between adjacent receptive
-    fields.
-
-  Returns:
-  A 2D array where each column is a receptive field of one of the inputs.
-  """
-
-
 def get_num_fields(x_shape, field_height, field_width, padding, stride):
   """
   Helper function to get the number of receptive fields in the horizontal
@@ -194,7 +129,69 @@ def col2im_indices(cols, x_shape, field_height=3, field_width=3, padding=1,
 
 
 def im2col_naive(x, field_height=3, field_width=3, padding=1, stride=1):
-  OF_THE_INPUTS__
+  """
+  Convert a 4D array of independent 3D inputs into a single 2D array where each
+  column is a receptive field of one of the inputs.
+
+  The input x has shape (N, C, H, W); this should be interpreted as N
+  independent inputs, each with height H, width H, and C channels.
+
+  A receptive field of a single input is a rectangular block that spans all
+  channels and whose height and width are given by field_height and field_width
+  respectively. We imagine sliding these receptive fields over each of the
+  inputs, where the horizontal and vertical offset between each receptive field
+  is given by the stride parameter.
+
+  Before extracting receptive fields, we also zero-pad the top, bottom,
+  left, and right of each input with zeros.
+
+  We will use this to efficiently implement convolution and pooling layers.
+
+  As a simple example, we run the following matrix through im2col with
+  field_height=field_width=2, padding=1, and stride=1:
+
+  [1 2]
+  [3 4]
+
+  We would first pad the matrix with 0, giving the following:
+
+  [0 0 0 0]
+  [0 1 2 0]
+  [0 3 4 0]
+  [0 0 0 0]
+
+  We would then slide a 2x2 window over this padded array, and reshape each
+  window to a column, producing the following:
+
+  [0 0 0 0 1 2 0 3 4] 
+  [0 0 0 1 2 0 3 4 0]
+  [0 1 2 0 3 4 0 0 0]
+  [1 2 0 3 4 0 0 0 0]
+
+  You should use the field_coords generator function from above to iterate over
+  receptive fields. So that downstream reshape operations work properly, you
+  should iterate first over receptive fields and then over inputs. In other
+  words, you should have a loop that looks like this:
+
+  next_col = 0
+  for y0, y1, x0, x1 in field_coords(params):
+    for i in xrange(num_inputs):
+      cols[:, next_col] = [something]
+      next_col += 1
+
+  Inputs:
+  - x: 4D array of shape (N, C, H, W). This should be interpreted as N
+    independent inputs, each with height H, width W, and C channels.
+  - field_height: Integer; height of each receptive field
+  - field_width: Intger; width of each receptive field
+  - padding: The number of pixels of zero-padding to apply to x before
+    extracting receptive fields.
+  - stride: The horizontal and vertical offsets between adjacent receptive
+    fields.
+
+  Returns:
+  A 2D array where each column is a receptive field of one of the inputs.
+  """
   # First figure out what the size of the output should be
   N, C, H, W = x.shape
   HH, WW = get_num_fields(x.shape, field_height, field_width, padding, stride)
@@ -283,9 +280,3 @@ def col2im(cols, x_shape, field_height=3, field_width=3, padding=1, stride=1):
     x = x_padded
   assert x.shape == x_shape, 'Expected shape %r but got shape %r' % (x_shape, x.shape)
   return x
-
-if __name__ == '__main__':
-    x_shape = (2, 3, 4, 4)
-    w_shape = (3, 3, 4, 4)
-    x = np.linspace(-0.1, 0.5, num=np.prod(x_shape)).reshape(x_shape)
-    im2col_indices(x, 2, 2)

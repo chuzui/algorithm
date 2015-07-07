@@ -113,7 +113,7 @@ class ClassifierTrainer(object):
                     # dx. Don't forget to also update step_cache[p]. Use smoothing 1e-8 #
                     #####################################################################
                     self.step_cache[p] = decay_rate * self.step_cache[p] + (1 - decay_rate) * grads[p]**2
-                    dx = - learning_razlzlte * grads[p] / np.sqrt(self.step_cache[p] + 1e-8)
+                    dx = - learning_rate  * grads[p] / np.sqrt(self.step_cache[p] + 1e-8)
                     #####################################################################
                     # END OF YOUR CODE                             #
                     #####################################################################

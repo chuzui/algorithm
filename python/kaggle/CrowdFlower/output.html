@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Triskelion &bull; Normalized Kaggle Distance</title>
+		<meta name="robots" content="noindex,nofollow,noodp,nonothing,goaway">
+		<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,800' rel='stylesheet' type='text/css'>
+		<style>
+			* { margin:0; padding: 0;}
+			body { font-family: "Open Sans",Verdana,sans-serif; margin: 30px auto; width: 700px; }
+			p { font-size: 18px; line-height: 27px; padding-bottom: 27px; color: #111; }
+			h1 { font-weight: 800; font-size: 33px; color: #2C3E50; padding-bottom: 10px;}
+			h2 { font-weight: 800; font-size: 22px; color: #2C3E50; padding-bottom: 10px; }
+			h3 { font-weight: 800; font-size: 18px; color: #34495E; padding-bottom: 10px; }
+			small { color: #7F8C8D; }
+			ul.panes { display: block; overflow: hidden; list-style-type: none; padding: 10px 0px;}
+			li.pane { float: left; width: 300px; margin-right: 40px; padding-bottom: 40px; }
+			ul { list-style-type: none; }
+			span { display: block; width: 50px; padding-right: 15px; text-align: right; height: 20px; float: left; }
+			li ul li { color: #7F8C8D; }
+			li ul li:first-child { color: #111; }
+			.node { font: 400 14px "Open Sans", Verdana, sans-serif; fill: #333; cursor:pointer;}
+			.node:hover {fill: #000;}
+			.link {stroke: steelblue; stroke-opacity:.4;fill: none; pointer-events: none;}
+			.node:hover,.node--source,.node--target { font-weight: 700;}
+			.node--source { fill: #2ca02c;}
+			.node--target { fill: #d62728;}
+			.link--source,.link--target { stroke-opacity: 1; stroke-width: 2px;}
+			.link--source { stroke: #d62728;}
+			.link--target { stroke: #2ca02c;}
+		</style>
+	</head>
+	<body>
+	    <noscript>Uses JavaScript for visualizations (d3.js)</noscript>
+		<h1>Normalized Kaggle Distance</h2>
+		<p>Normalized Kaggle Distance (NKD) uses a search engine index as a compressor by looking at page count statistics. Semantically related words get a closer distance. This allows us to do all sorts of fun stuff.</p>
+		<p>NKD is based on <a href="http://en.wikipedia.org/wiki/Normalized_Google_distance">Normalized Google Distance</a> which uses the Google index. We show that, even with a relatively small corpus, we can still extract useful semantic information.</p>
+
+		<h2>Semantic Knowledge Base</h2>
+
+		<ul class="panes">
+			<li class="pane"><h3>Who created the iPhone phone?</h3><ul><li><span>0.134</span>Apple</li><li><span>0.652</span>Google</li><li><span>0.768</span>Amazon</li><li><span>2.0</span>Microsoft</li><li><span>2.0</span>Motorola</li></ul></li> <li class="pane"><h3>Who created the Nexus phone?</h3><ul><li><span>0.188</span>Google</li><li><span>0.236</span>Motorola</li><li><span>0.355</span>Amazon</li><li><span>0.44</span>Microsoft</li><li><span>0.57</span>Apple</li></ul></li> <li class="pane"><h3>Who created the Moto phone?</h3><ul><li><span>0.188</span>Motorola</li><li><span>0.282</span>Google</li><li><span>0.332</span>Amazon</li><li><span>0.452</span>Microsoft</li><li><span>0.523</span>Apple</li></ul></li> <li class="pane"><h3>Who created the Fire phone?</h3><ul><li><span>0.547</span>Amazon</li><li><span>0.681</span>Motorola</li><li><span>0.706</span>Google</li><li><span>0.732</span>Microsoft</li><li><span>1.049</span>Apple</li></ul></li> <li class="pane"><h3>Which major film studio produced the Batman films?</h3><ul><li><span>0.445</span>Warner</li><li><span>0.853</span>Universal</li><li><span>2.0</span>20th</li><li><span>2.0</span>Colombia</li><li><span>2.0</span>Disney</li><li><span>2.0</span>Fox</li><li><span>2.0</span>Goldwyn</li><li><span>2.0</span>Paramount</li><li><span>2.0</span>Sony</li></ul></li> <li class="pane"><h3>Which major film studio produced the film Frozen?</h3><ul><li><span>0.308</span>Disney</li><li><span>0.85</span>Universal</li><li><span>2.0</span>20th</li><li><span>2.0</span>Colombia</li><li><span>2.0</span>Fox</li><li><span>2.0</span>Goldwyn</li><li><span>2.0</span>Paramount</li><li><span>2.0</span>Sony</li><li><span>2.0</span>Warner</li></ul></li>
+		</ul>
+
+		<h2>Topic Modeling</h2>
+		<h3>Topic: Laptop</h3><p>optical, receiver, 4ghz, mice, mouse, computer, pc, keyboard, apple, macbook, lenovo, intel, briefcase, snap, 13, insten, thinkpad, scratches, laptops, kb, restrict, desktop, keys, tactile, thin</p><h3>Topic: Children</h3><p>child, ages, ride, harness, seat, juvenile, wheels, adults, baby, older, enjoyable, parent, young, stroller, point, kids, canopies, horn, fun, years, reclining, rear, childhood, parents, seats</p><h3>Topic: Movies</h3><p>entertainment, backup, developer, ensuring, games, shows, focused, gamer, videos, photos, apps, connected, viewing, 10gb, share, cloud, console, music, folders, watching, saved, television, copies, 1080p, files</p>
+
+		<h2>Force-Directed Clustering <small>(drag to interact)</small></h2>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+		<script>
+		function draw_cluster_graph(){
+			var json = {"links": [{"source": 0, "strength": 0.45710609939769925, "target": 1}, {"source": 0, "strength": 0.7666142862777781, "target": 2}, {"source": 0, "strength": 0.6989390699638551, "target": 3}, {"source": 0, "strength": 0.8500960399366299, "target": 4}, {"source": 0, "strength": 0.7320517734671887, "target": 5}, {"source": 0, "strength": 0.7065372109955643, "target": 6}, {"source": 0, "strength": 0.7278627611516701, "target": 7}, {"source": 0, "strength": 0.7138589010097666, "target": 8}, {"source": 1, "strength": 0.8109528294934696, "target": 2}, {"source": 1, "strength": 0.7379276233410461, "target": 3}, {"source": 1, "strength": 0.7360740716479548, "target": 4}, {"source": 1, "strength": 0.8113969418780509, "target": 5}, {"source": 1, "strength": 0.7426058531117162, "target": 6}, {"source": 1, "strength": 0.8907313045965076, "target": 7}, {"source": 1, "strength": 0.6698019480295021, "target": 8}, {"source": 2, "strength": 0.7366238195101057, "target": 3}, {"source": 2, "strength": 0.813364506888418, "target": 4}, {"source": 2, "strength": 1.028860583769345, "target": 5}, {"source": 2, "strength": 1.101635943015384, "target": 6}, {"source": 2, "strength": 0.9727398668309079, "target": 7}, {"source": 2, "strength": 0.6382443973827542, "target": 8}, {"source": 3, "strength": 0.8908952144218306, "target": 4}, {"source": 3, "strength": 0.833285709970469, "target": 5}, {"source": 3, "strength": 1.043522338583441, "target": 6}, {"source": 3, "strength": 0.7662903827363701, "target": 7}, {"source": 3, "strength": 0.5375073029827778, "target": 8}, {"source": 4, "strength": 0.313112661513917, "target": 5}, {"source": 4, "strength": 0.5423774477249647, "target": 6}, {"source": 4, "strength": 0.3384615348263871, "target": 7}, {"source": 4, "strength": 0.7474623707442992, "target": 8}, {"source": 5, "strength": 0.39561214178161347, "target": 6}, {"source": 5, "strength": 0.30648386152692, "target": 7}, {"source": 5, "strength": 0.7475599736976758, "target": 8}, {"source": 6, "strength": 0.4068341632813647, "target": 7}, {"source": 6, "strength": 0.9075817881632972, "target": 8}, {"source": 7, "strength": 0.7545613227900972, "target": 8}], "nodes": [{"s": "one", "y": 3204}, {"s": "two", "y": 2009}, {"s": "white", "y": 3020}, {"s": "green", "y": 1398}, {"s": "pc", "y": 662}, {"s": "laptop", "y": 539}, {"s": "desktop", "y": 188}, {"s": "mouse", "y": 694}, {"s": "red", "y": 1489}]};
+
+			var width = 700,
+				height = 600;
+
+			var svg = d3.select("body").append("svg")
+				.attr("width", width)
+				.attr("height", height);
+
+			var force = d3.layout.force()
+						.gravity(.05)
+						.distance(800)
+						.charge(-800)
+						.size([width, height]);
+
+			force
+				.nodes(json.nodes)
+				.links(json.links)
+				.linkDistance(function(d) { return  300 - ((1 - d.strength) * 300); })
+				.start();
+
+			var link = svg.selectAll(".link")
+						.data(json.links)
+						.enter().append("line")
+						.attr("class", "link")
+						.style("stroke", "#2C3E50")
+						.style("stroke-opacity", function(d) { return 0.2 - (d.strength/4); })
+						.style("stroke-width", 1)
+						  ;
+			var node = svg.selectAll(".node")
+						.data(json.nodes)
+						.enter().append("g")
+						.attr("class", "node")
+						.call(force.drag);
+
+			node.append("circle")
+				.attr("r", function(d) { return (Math.log(d.y) * 5)+3; })
+				.style("fill", "#3498DB")
+				.style("fill-opacity", 0.23);
+
+			node.append("text")
+				.attr("dx", 12)
+				.attr("class", "text")
+				.attr("dy", ".35em")
+				.style("font-family", "Open Sans")
+				.style("font-weight", "400")
+				.style("color", "#2C3E50")
+				.text(function(d) { return d.s });
+
+			force.on("tick", function() {
+				link.attr("x1", function(d) { return d.source.x; })
+					.attr("y1", function(d) { return d.source.y; })
+					.attr("x2", function(d) { return d.target.x; })
+					.attr("y2", function(d) { return d.target.y; });
+
+				node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+			});
+
+		};
+		draw_cluster_graph();
+
+		d3.select("body").append("h2").text("Hierarchical edge bundling");
+		var diameter = 700,
+			radius = diameter / 2,
+			innerRadius = radius - 120;
+
+		var cluster = d3.layout.cluster()
+			.size([360, innerRadius])
+			.sort(null)
+			.value(function(d) { return d.size; });
+
+		var bundle = d3.layout.bundle();
+
+		var line = d3.svg.line.radial()
+			.interpolate("bundle")
+			.tension(.85)
+			.radius(function(d) { return d.y; })
+			.angle(function(d) { return d.x / 180 * Math.PI; });
+
+		var svg = d3.select("body").append("svg")
+			.attr("width", diameter)
+			.attr("height", diameter)
+		  .append("g")
+			.attr("transform", "translate(" + radius + "," + radius + ")");
+
+		var link = svg.append("g").selectAll(".link"),
+			node = svg.append("g").selectAll(".node");
+
+		var classes = [{"imports": ["you", "that", "or", "your"], "name": "it"}, {"imports": ["that", "or", "to", "is"], "name": "features"}, {"imports": ["it", "an", "from", "you"], "name": "that"}, {"imports": ["a", "of", "and", "for"], "name": "to"}, {"imports": ["color", "case", "features", "1"], "name": "black"}, {"imports": ["that", "or", "to", "you"], "name": "from"}, {"imports": ["be", "so", "you", "that"], "name": "can"}, {"imports": ["a", "of", "for", "in"], "name": "is"}, {"imports": ["a", "to", "with", "of"], "name": "and"}, {"imports": ["you", "to", "is", "with"], "name": "your"}, {"imports": ["use", "makes", "up", "clean"], "name": "easy"}, {"imports": ["that", "as", "or", "all"], "name": "an"}, {"imports": ["a", "to", "and", "of"], "name": "for"}, {"imports": ["and", "for", "with", "to"], "name": "a"}, {"imports": ["it", "your", "that", "or"], "name": "you"}, {"imports": ["of", "a", "to", "is"], "name": "in"}, {"imports": ["to", "in", "a", "and"], "name": "of"}, {"imports": ["on", "it", "your", "is"], "name": "or"}, {"imports": ["can", "it", "easy", "or"], "name": "up"}, {"imports": ["1", "x", "5", "3"], "name": "2"}, {"imports": ["all", "that", "can", "or"], "name": "are"}, {"imports": ["a", "in", "is", "to"], "name": "s"}, {"imports": ["x", "dimensions", "1", "2"], "name": "5"}, {"imports": ["a", "and", "to", "for"], "name": "with"}, {"imports": ["that", "also", "an", "can"], "name": "has"}, {"imports": ["2", "x", "3", "5"], "name": "1"}, {"imports": ["easy", "that", "has", "allows"], "name": "design"}, {"imports": ["or", "it", "your", "all"], "name": "on"}, {"imports": ["3", "x", "1", "2"], "name": "4"}, {"imports": ["1", "x", "4", "2"], "name": "3"}, {"imports": ["x", "dimensions", "1", "8"], "name": "includes"}, {"imports": ["look", "cotton", "button", "comfort"], "name": "classic"}, {"imports": ["comfort", "fit", "makes", "long"], "name": "comfortable"}, {"imports": ["be", "any", "it", "can"], "name": "will"}, {"imports": ["as", "be", "or", "on"], "name": "all"}, {"imports": ["easy", "it", "comfortable", "safe"], "name": "makes"}, {"imports": ["can", "as", "will", "all"], "name": "be"}, {"imports": ["100", "x", "will", "that"], "name": "made"}, {"imports": ["inches", "dimensions", "x", "1"], "name": "high"}, {"imports": ["can", "has", "comes", "so"], "name": "also"}, {"imports": ["will", "be", "can", "or"], "name": "any"}, {"imports": ["cleaning", "care", "easy", "safe"], "name": "clean"}, {"imports": ["dimensions", "x", "8", "inches"], "name": "6"}, {"imports": ["be", "all", "by", "an"], "name": "as"}, {"imports": ["x", "inches", "dimensions", "1"], "name": "color"}, {"imports": ["safe", "while", "so", "out"], "name": "keep"}, {"imports": ["can", "home", "has", "be"], "name": "at"}, {"imports": ["cotton", "comfort", "comfortable", "dress"], "name": "fit"}, {"imports": ["inches", "dimensions", "dress", "comfortable"], "name": "long"}, {"imports": ["8", "dimensions", "x", "5"], "name": "10"}, {"imports": ["also", "so", "has", "that"], "name": "comes"}, {"imports": ["safe", "case", "0", "hard"], "name": "hard"}, {"imports": ["makes", "go", "use", "safe"], "name": "ideal"}, {"imports": ["kitchen", "safe", "cooking", "cleaning"], "name": "handle"}, {"imports": ["foam", "comfortable", "fit", "while"], "name": "comfort"}, {"imports": ["care", "clean", "material", "cooking"], "name": "cleaning"}, {"imports": ["fryer", "deep", "electric", "cleaning"], "name": "fryer"}, {"imports": ["safe", "easy", "makes", "comfortable"], "name": "durable"}, {"imports": ["handle", "cooking", "safe", "kitchen"], "name": "kitchen"}, {"imports": ["be", "as", "all", "an"], "name": "by"}, {"imports": ["electric", "cooking", "fryer", "safe"], "name": "electric"}, {"imports": ["so", "cooking", "easily", "safe"], "name": "even"}, {"imports": ["so", "will", "it", "out"], "name": "make"}, {"imports": ["comfort", "while", "fit", "use"], "name": "designed"}, {"imports": ["button", "100", "out", "cotton"], "name": "down"}, {"imports": ["can", "it", "even", "out"], "name": "so"}, {"imports": ["keep", "also", "comfort", "offers"], "name": "while"}, {"imports": ["battery", "digital", "control", "offers"], "name": "built"}, {"imports": ["at", "any", "kitchen", "will"], "name": "home"}, {"imports": ["cotton", "machine", "care", "made"], "name": "100"}, {"imports": ["inches", "x", "material", "0"], "name": "dimensions"}, {"imports": ["cleaning", "machine", "material", "cotton"], "name": "care"}, {"imports": ["even", "allows", "so", "can"], "name": "easily"}, {"imports": ["100", "button", "color", "cotton"], "name": "blue"}, {"imports": ["x", "dimensions", "1", "10"], "name": "8"}, {"imports": ["easily", "while", "easy", "safe"], "name": "allows"}, {"imports": ["ice", "cup", "maker", "cream"], "name": "maker"}, {"imports": ["while", "free", "hard", "also"], "name": "offers"}, {"imports": ["100", "machine", "care", "button"], "name": "cotton"}, {"imports": ["dimensions", "material", "8", "x"], "name": "0"}, {"imports": ["any", "kitchen", "home", "look"], "name": "add"}, {"imports": ["care", "cotton", "100", "cleaning"], "name": "machine"}, {"imports": ["maker", "cup", "12", "safe"], "name": "cup"}, {"imports": ["dimensions", "x", "deep", "long"], "name": "inches"}, {"imports": ["out", "so", "it", "even"], "name": "just"}, {"imports": ["kitchen", "safe", "cleaning", "even"], "name": "cooking"}, {"imports": ["safe", "offers", "included", "while"], "name": "free"}, {"imports": ["comfortable", "cotton", "add", "look"], "name": "colors"}, {"imports": ["case", "hard", "while", "4"], "name": "case"}, {"imports": ["battery", "included", "built", "0"], "name": "battery"}, {"imports": ["foam", "comfort", "machine", "while"], "name": "foam"}, {"imports": ["0", "digital", "built", "battery"], "name": "digital"}, {"imports": ["down", "cotton", "100", "long"], "name": "button"}, {"imports": ["bike", "included", "inch", "safe"], "name": "bike"}, {"imports": ["dimensions", "battery", "x", "1"], "name": "included"}, {"imports": ["as", "be", "by", "an"], "name": "its"}, {"imports": ["dimensions", "inches", "1", "5"], "name": "x"}, {"imports": ["dress", "long", "look", "fit"], "name": "dress"}, {"imports": ["inches", "dimensions", "handle", "long"], "name": "inch"}, {"imports": ["dimensions", "care", "cleaning", "0"], "name": "material"}, {"imports": ["cleaning", "blue", "light", "also"], "name": "decreasing"}, {"imports": ["down", "button", "cream", "out"], "name": "jachs"}, {"imports": ["ice", "cream", "maker", "0"], "name": "cream"}, {"imports": ["included", "dimensions", "light", "color"], "name": "light"}, {"imports": ["so", "just", "will", "it"], "name": "out"}, {"imports": ["battery", "ideal", "just", "so"], "name": "go"}, {"imports": ["dimensions", "cup", "x", "8"], "name": "12"}, {"imports": ["cream", "ice", "maker", "make"], "name": "ice"}, {"imports": ["machine", "long", "so", "dress"], "name": "graham"}, {"imports": ["fryer", "inches", "x", "high"], "name": "deep"}, {"imports": ["easy", "can", "it", "will"], "name": "use"}, {"imports": ["cooking", "built", "allows", "safe"], "name": "control"}, {"imports": ["dress", "classic", "will", "cotton"], "name": "look"}, {"imports": ["cooking", "hard", "keep", "care"], "name": "safe"}, {"imports": ["13pk", "12", "out", "at"], "name": "13pk"}];
+
+		  var nodes = cluster.nodes(packageHierarchy(classes)),
+			  links = packageImports(nodes);
+
+		  link = link
+			  .data(bundle(links))
+			.enter().append("path")
+			  .each(function(d) { d.source = d[0], d.target = d[d.length - 1]; })
+			  .attr("class", "link")
+			  .attr("d", line);
+
+		  node = node
+			  .data(nodes.filter(function(n) { return !n.children; }))
+			.enter().append("text")
+			  .attr("class", "node")
+			  .attr("dy", ".31em")
+			  .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + (d.y + 8) + ",0)" + (d.x < 180 ? "" : "rotate(180)"); })
+			  .style("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
+			  .text(function(d) { return d.key; })
+			  .on("mouseover", mouseovered)
+			  .on("mouseout", mouseouted);
+
+
+		function mouseovered(d) {
+		  node
+			  .each(function(n) { n.target = n.source = false; });
+
+		  link
+			  .classed("link--target", function(l) { if (l.target === d) return l.source.source = true; })
+			  .classed("link--source", function(l) { if (l.source === d) return l.target.target = true; })
+			.filter(function(l) { return l.target === d || l.source === d; })
+			  .each(function() { this.parentNode.appendChild(this); });
+
+		  node
+			  .classed("node--target", function(n) { return n.target; })
+			  .classed("node--source", function(n) { return n.source; });
+		}
+
+		function mouseouted(d) {
+		  link
+			  .classed("link--target", false)
+			  .classed("link--source", false);
+
+		  node
+			  .classed("node--target", false)
+			  .classed("node--source", false);
+		}
+
+		d3.select(self.frameElement).style("height", diameter + "px");
+
+		// Lazily construct the package hierarchy from class names.
+		function packageHierarchy(classes) {
+		  var map = {};
+
+		  function find(name, data) {
+			var node = map[name], i;
+			if (!node) {
+			  node = map[name] = data || {name: name, children: []};
+			  if (name.length) {
+				node.parent = find(name.substring(0, i = name.lastIndexOf(".")));
+				node.parent.children.push(node);
+				node.key = name.substring(i + 1);
+			  }
+			}
+			return node;
+		  }
+
+		  classes.forEach(function(d) {
+			find(d.name, d);
+		  });
+
+		  return map[""];
+		}
+
+		// Return a list of imports for the given array of nodes.
+		function packageImports(nodes) {
+		  var map = {},
+			  imports = [];
+
+		  // Compute a map from name to node.
+		  nodes.forEach(function(d) {
+			map[d.name] = d;
+		  });
+
+		  // For each import, construct a link from the source to target node.
+		  nodes.forEach(function(d) {
+			if (d.imports) d.imports.forEach(function(i) {
+			  imports.push({source: map[d.name], target: map[i]});
+			});
+		  });
+
+		  return imports;
+		}
+
+
+
+		</script>
+	</body>
+</html>
